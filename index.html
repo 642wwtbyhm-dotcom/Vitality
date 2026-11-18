@@ -1,0 +1,455 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tracker</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@500;600;700&display=swap" rel="stylesheet">
+    <style>
+        body { font-family: 'Inter', sans-serif; }
+        select {
+            appearance: none;
+            background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 20 20'%3e%3cpath stroke='%23475569' stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M6 8l4 4 4-4'/%3e%3c/svg%3e");
+            background-position: right 0.5rem center;
+            background-repeat: no-repeat;
+            background-size: 1.1em 1.1em;
+        }
+    </style>
+</head>
+<body class="bg-slate-100 text-slate-900 min-h-screen flex flex-col items-center justify-start p-3 sm:p-6">
+
+    <div class="w-full max-w-xl">
+        <!-- Karteikarten-Tabs -->
+        <nav class="flex gap-1 px-2" role="tablist">
+            <button type="button" id="tab-eingabe" onclick="switchTab('eingabe')" role="tab" aria-selected="true"
+                class="flex-1 py-3 px-4 rounded-t-2xl text-sm sm:text-base font-bold bg-white text-slate-900 shadow-xs border-t border-x border-slate-200 transition">
+                Eingabe
+            </button>
+            <button type="button" id="tab-grafik" onclick="switchTab('grafik')" role="tab" aria-selected="false"
+                class="flex-1 py-3 px-4 rounded-t-2xl text-sm sm:text-base font-semibold bg-slate-200/80 text-slate-600 hover:text-slate-900 border-t border-x border-transparent transition">
+                Grafik
+            </button>
+        </nav>
+
+        <!-- Karteikarten-Inhalt -->
+        <main class="bg-white rounded-2xl shadow-sm border border-slate-200 p-4 sm:p-6">
+
+            <!-- SEITE 1: EINGABE -->
+            <section id="view-eingabe" class="space-y-4">
+                <form id="entry-form" onsubmit="handleSave(event)" class="space-y-3">
+                    <!-- Datum & Uhrzeit -->
+                    <div>
+                        <input type="datetime-local" id="entry-datetime" required
+                            class="w-full rounded-xl border border-slate-300 bg-slate-50 px-3.5 py-2.5 text-sm font-semibold text-slate-900 focus:border-teal-600 focus:bg-white focus:outline-none">
+                    </div>
+
+                    <!-- 6 Kompakte Zeilen -->
+                    <div class="divide-y divide-slate-100 border border-slate-200 rounded-xl overflow-hidden">
+                        <!-- 1. Alkohol -->
+                        <div class="flex items-center justify-between px-3.5 py-2.5 bg-white">
+                            <label for="factor-alkohol" class="text-sm sm:text-base font-semibold text-slate-800 flex items-center gap-2.5">
+                                <span class="w-3 h-3 rounded-full bg-rose-500 shrink-0"></span>
+                                Alkohol
+                            </label>
+                            <select id="factor-alkohol" class="w-24 rounded-lg border border-slate-300 bg-slate-50 pl-3 pr-7 py-1.5 text-sm font-bold text-center text-slate-900 focus:border-teal-600 focus:outline-none">
+                                <option value="-2">-2</option>
+                                <option value="-1">-1</option>
+                                <option value="0" selected>0</option>
+                                <option value="1">+1</option>
+                                <option value="2">+2</option>
+                            </select>
+                        </div>
+
+                        <!-- 2. Luftdruck -->
+                        <div class="flex items-center justify-between px-3.5 py-2.5 bg-white">
+                            <label for="factor-luftdruck" class="text-sm sm:text-base font-semibold text-slate-800 flex items-center gap-2.5">
+                                <span class="w-3 h-3 rounded-full bg-sky-500 shrink-0"></span>
+                                Luftdruck
+                            </label>
+                            <select id="factor-luftdruck" class="w-24 rounded-lg border border-slate-300 bg-slate-50 pl-3 pr-7 py-1.5 text-sm font-bold text-center text-slate-900 focus:border-teal-600 focus:outline-none">
+                                <option value="-2">-2</option>
+                                <option value="-1">-1</option>
+                                <option value="0" selected>0</option>
+                                <option value="1">+1</option>
+                                <option value="2">+2</option>
+                            </select>
+                        </div>
+
+                        <!-- 3. Sport Vortag -->
+                        <div class="flex items-center justify-between px-3.5 py-2.5 bg-white">
+                            <label for="factor-sport" class="text-sm sm:text-base font-semibold text-slate-800 flex items-center gap-2.5">
+                                <span class="w-3 h-3 rounded-full bg-amber-500 shrink-0"></span>
+                                Sport Vortag
+                            </label>
+                            <select id="factor-sport" class="w-24 rounded-lg border border-slate-300 bg-slate-50 pl-3 pr-7 py-1.5 text-sm font-bold text-center text-slate-900 focus:border-teal-600 focus:outline-none">
+                                <option value="-2">-2</option>
+                                <option value="-1">-1</option>
+                                <option value="0" selected>0</option>
+                                <option value="1">+1</option>
+                                <option value="2">+2</option>
+                            </select>
+                        </div>
+
+                        <!-- 4. Schlaf -->
+                        <div class="flex items-center justify-between px-3.5 py-2.5 bg-white">
+                            <label for="factor-schlaf" class="text-sm sm:text-base font-semibold text-slate-800 flex items-center gap-2.5">
+                                <span class="w-3 h-3 rounded-full bg-indigo-500 shrink-0"></span>
+                                Schlaf
+                            </label>
+                            <select id="factor-schlaf" class="w-24 rounded-lg border border-slate-300 bg-slate-50 pl-3 pr-7 py-1.5 text-sm font-bold text-center text-slate-900 focus:border-teal-600 focus:outline-none">
+                                <option value="-2">-2</option>
+                                <option value="-1">-1</option>
+                                <option value="0" selected>0</option>
+                                <option value="1">+1</option>
+                                <option value="2">+2</option>
+                            </select>
+                        </div>
+
+                        <!-- 5. Motivation -->
+                        <div class="flex items-center justify-between px-3.5 py-2.5 bg-white">
+                            <label for="factor-motivation" class="text-sm sm:text-base font-semibold text-slate-800 flex items-center gap-2.5">
+                                <span class="w-3 h-3 rounded-full bg-violet-600 shrink-0"></span>
+                                Motivation
+                            </label>
+                            <select id="factor-motivation" class="w-24 rounded-lg border border-slate-300 bg-slate-50 pl-3 pr-7 py-1.5 text-sm font-bold text-center text-slate-900 focus:border-teal-600 focus:outline-none">
+                                <option value="-2">-2</option>
+                                <option value="-1">-1</option>
+                                <option value="0" selected>0</option>
+                                <option value="1">+1</option>
+                                <option value="2">+2</option>
+                            </select>
+                        </div>
+
+                        <!-- 6. Fitness -->
+                        <div class="flex items-center justify-between px-3.5 py-2.5 bg-white">
+                            <label for="factor-fitness" class="text-sm sm:text-base font-semibold text-slate-800 flex items-center gap-2.5">
+                                <span class="w-3 h-3 rounded-full bg-emerald-600 shrink-0"></span>
+                                Fitness
+                            </label>
+                            <select id="factor-fitness" class="w-24 rounded-lg border border-slate-300 bg-slate-50 pl-3 pr-7 py-1.5 text-sm font-bold text-center text-slate-900 focus:border-teal-600 focus:outline-none">
+                                <option value="-2">-2</option>
+                                <option value="-1">-1</option>
+                                <option value="0" selected>0</option>
+                                <option value="1">+1</option>
+                                <option value="2">+2</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <!-- Speichern-Button -->
+                    <button type="submit" id="btn-save"
+                        class="w-full py-3.5 px-4 rounded-xl bg-teal-600 hover:bg-teal-700 active:bg-teal-800 text-white font-bold text-base shadow-xs transition flex items-center justify-center gap-2">
+                        <span>Speichern</span>
+                    </button>
+                </form>
+            </section>
+
+            <!-- SEITE 2: GRAFIK -->
+            <section id="view-grafik" class="hidden space-y-4">
+                <!-- Kopfzeile: Zeitraum-Buttons & Letzten Eintrag löschen -->
+                <div class="flex items-center justify-between gap-2">
+                    <div class="bg-slate-100 p-1 rounded-xl flex gap-1">
+                        <button type="button" onclick="setRange('7')" id="range-7" class="px-3 py-1.5 rounded-lg text-xs font-bold bg-white text-slate-900 shadow-xs transition">7T</button>
+                        <button type="button" onclick="setRange('30')" id="range-30" class="px-3 py-1.5 rounded-lg text-xs font-semibold text-slate-600 hover:text-slate-900 transition">30T</button>
+                        <button type="button" onclick="setRange('all')" id="range-all" class="px-3 py-1.5 rounded-lg text-xs font-semibold text-slate-600 hover:text-slate-900 transition">Alle</button>
+                    </div>
+
+                    <button type="button" onclick="deleteLastEntry()" aria-label="Letzten Eintrag löschen"
+                        class="p-2 rounded-xl border border-slate-200 text-slate-500 hover:text-rose-600 hover:bg-rose-50 transition">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path>
+                        </svg>
+                    </button>
+                </div>
+
+                <!-- Liniendiagramm -->
+                <div class="relative w-full h-72 sm:h-80">
+                    <canvas id="trendChart"></canvas>
+                </div>
+
+                <!-- 6 Kompakte Filter-Chips -->
+                <div id="filter-chips" class="grid grid-cols-2 sm:grid-cols-3 gap-2 pt-1"></div>
+            </section>
+
+        </main>
+    </div>
+
+    <script>
+        const STORAGE_KEY = 'minimal_factor_tracker_v1';
+
+        const FACTORS = [
+            { key: 'alkohol',    label: 'Alkohol',      color: '#f43f5e', visible: true, dashed: true },
+            { key: 'luftdruck',  label: 'Luftdruck',    color: '#0ea5e9', visible: true, dashed: true },
+            { key: 'sport',      label: 'Sport Vortag', color: '#f59e0b', visible: true, dashed: true },
+            { key: 'schlaf',     label: 'Schlaf',       color: '#6366f1', visible: true, dashed: true },
+            { key: 'motivation', label: 'Motivation',   color: '#8b5cf6', visible: true, dashed: false },
+            { key: 'fitness',    label: 'Fitness',      color: '#10b981', visible: true, dashed: false }
+        ];
+
+        let entries = [];
+        let currentRange = '7';
+        let chartInstance = null;
+
+        document.addEventListener('DOMContentLoaded', () => {
+            setNow();
+            initStorage();
+            renderFilterChips();
+        });
+
+        function toLocalISO(date) {
+            const pad = n => String(n).padStart(2, '0');
+            return `${date.getFullYear()}-${pad(date.getMonth() + 1)}-${pad(date.getDate())}T${pad(date.getHours())}:${pad(date.getMinutes())}`;
+        }
+
+        function setNow() {
+            document.getElementById('entry-datetime').value = toLocalISO(new Date());
+        }
+
+        function initStorage() {
+            try {
+                const raw = localStorage.getItem(STORAGE_KEY);
+                if (raw) {
+                    entries = JSON.parse(raw);
+                } else {
+                    entries = createSampleData();
+                    saveStorage();
+                }
+            } catch (e) {
+                entries = createSampleData();
+            }
+        }
+
+        function saveStorage() {
+            entries.sort((a, b) => new Date(a.timestamp) - new Date(b.timestamp));
+            localStorage.setItem(STORAGE_KEY, JSON.stringify(entries));
+        }
+
+        function createSampleData() {
+            const data = [];
+            const now = new Date();
+            const pattern = [
+                { alkohol: 0,  luftdruck: 1,  sport: 1,  schlaf: 1,  motivation: 1,  fitness: 1 },
+                { alkohol: -2, luftdruck: -1, sport: 0,  schlaf: -2, motivation: -1, fitness: -2 },
+                { alkohol: 1,  luftdruck: 0,  sport: 1,  schlaf: 0,  motivation: 0,  fitness: 0 },
+                { alkohol: 2,  luftdruck: 2,  sport: 2,  schlaf: 2,  motivation: 2,  fitness: 2 },
+                { alkohol: 0,  luftdruck: -2, sport: -1, schlaf: 0,  motivation: -1, fitness: -1 },
+                { alkohol: -1, luftdruck: -1, sport: 0,  schlaf: -1, motivation: 0,  fitness: -1 },
+                { alkohol: 1,  luftdruck: 1,  sport: 1,  schlaf: 1,  motivation: 1,  fitness: 1 },
+                { alkohol: 2,  luftdruck: 1,  sport: 2,  schlaf: 2,  motivation: 2,  fitness: 2 },
+                { alkohol: 0,  luftdruck: 0,  sport: -1, schlaf: 1,  motivation: 1,  fitness: 0 },
+                { alkohol: 1,  luftdruck: 1,  sport: 1,  schlaf: 1,  motivation: 2,  fitness: 1 }
+            ];
+
+            for (let i = 9; i >= 0; i--) {
+                const d = new Date(now);
+                d.setDate(now.getDate() - i);
+                d.setHours(8, 30, 0, 0);
+                data.push({
+                    timestamp: toLocalISO(d),
+                    ...pattern[9 - i]
+                });
+            }
+            return data;
+        }
+
+        function switchTab(tab) {
+            const isEingabe = tab === 'eingabe';
+            const tabEin = document.getElementById('tab-eingabe');
+            const tabGra = document.getElementById('tab-grafik');
+            const viewEin = document.getElementById('view-eingabe');
+            const viewGra = document.getElementById('view-grafik');
+
+            if (isEingabe) {
+                tabEin.className = 'flex-1 py-3 px-4 rounded-t-2xl text-sm sm:text-base font-bold bg-white text-slate-900 shadow-xs border-t border-x border-slate-200 transition';
+                tabEin.setAttribute('aria-selected', 'true');
+                tabGra.className = 'flex-1 py-3 px-4 rounded-t-2xl text-sm sm:text-base font-semibold bg-slate-200/80 text-slate-600 hover:text-slate-900 border-t border-x border-transparent transition';
+                tabGra.setAttribute('aria-selected', 'false');
+                viewEin.classList.remove('hidden');
+                viewGra.classList.add('hidden');
+            } else {
+                tabGra.className = 'flex-1 py-3 px-4 rounded-t-2xl text-sm sm:text-base font-bold bg-white text-slate-900 shadow-xs border-t border-x border-slate-200 transition';
+                tabGra.setAttribute('aria-selected', 'true');
+                tabEin.className = 'flex-1 py-3 px-4 rounded-t-2xl text-sm sm:text-base font-semibold bg-slate-200/80 text-slate-600 hover:text-slate-900 border-t border-x border-transparent transition';
+                tabEin.setAttribute('aria-selected', 'false');
+                viewGra.classList.remove('hidden');
+                viewEin.classList.add('hidden');
+                renderChart();
+            }
+        }
+
+        function handleSave(e) {
+            e.preventDefault();
+            const timestamp = document.getElementById('entry-datetime').value;
+            if (!timestamp) return;
+
+            const entry = {
+                timestamp,
+                alkohol: parseInt(document.getElementById('factor-alkohol').value, 10),
+                luftdruck: parseInt(document.getElementById('factor-luftdruck').value, 10),
+                sport: parseInt(document.getElementById('factor-sport').value, 10),
+                schlaf: parseInt(document.getElementById('factor-schlaf').value, 10),
+                motivation: parseInt(document.getElementById('factor-motivation').value, 10),
+                fitness: parseInt(document.getElementById('factor-fitness').value, 10)
+            };
+
+            entries.push(entry);
+            saveStorage();
+
+            // Formular zurücksetzen
+            FACTORS.forEach(f => {
+                document.getElementById(`factor-${f.key}`).value = '0';
+            });
+            setNow();
+
+            // Kurzes visuelles Feedback auf dem Button & Wechsel zur Grafik
+            const btn = document.getElementById('btn-save');
+            btn.innerHTML = `<svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7"></path></svg>`;
+            btn.classList.replace('bg-teal-600', 'bg-emerald-600');
+
+            setTimeout(() => {
+                btn.innerHTML = `<span>Speichern</span>`;
+                btn.classList.replace('bg-emerald-600', 'bg-teal-600');
+                switchTab('grafik');
+            }, 350);
+        }
+
+        function deleteLastEntry() {
+            if (entries.length === 0) return;
+            entries.pop();
+            saveStorage();
+            renderChart();
+        }
+
+        function setRange(range) {
+            currentRange = range;
+            ['7', '30', 'all'].forEach(r => {
+                const el = document.getElementById(`range-${r}`);
+                el.className = r === range
+                    ? 'px-3 py-1.5 rounded-lg text-xs font-bold bg-white text-slate-900 shadow-xs transition'
+                    : 'px-3 py-1.5 rounded-lg text-xs font-semibold text-slate-600 hover:text-slate-900 transition';
+            });
+            renderChart();
+        }
+
+        function getFilteredEntries() {
+            if (currentRange === 'all') return entries;
+            const days = parseInt(currentRange, 10);
+            const cutoff = new Date();
+            cutoff.setDate(cutoff.getDate() - days);
+            cutoff.setHours(0, 0, 0, 0);
+            return entries.filter(item => new Date(item.timestamp) >= cutoff);
+        }
+
+        function renderFilterChips() {
+            const container = document.getElementById('filter-chips');
+            container.innerHTML = '';
+
+            FACTORS.forEach(f => {
+                const btn = document.createElement('button');
+                btn.type = 'button';
+                btn.onclick = () => {
+                    f.visible = !f.visible;
+                    renderFilterChips();
+                    renderChart();
+                };
+                btn.className = f.visible
+                    ? 'flex items-center gap-2 px-3 py-2 rounded-xl text-xs font-bold bg-slate-900 text-white transition'
+                    : 'flex items-center gap-2 px-3 py-2 rounded-xl text-xs font-semibold bg-slate-100 text-slate-500 transition';
+
+                const lineIndicator = f.dashed
+                    ? `<svg class="w-4 h-2 shrink-0" viewBox="0 0 16 4" fill="none"><line x1="0" y1="2" x2="16" y2="2" stroke="${f.color}" stroke-width="2.5" stroke-dasharray="4 2.5"/></svg>`
+                    : `<svg class="w-4 h-2 shrink-0" viewBox="0 0 16 4" fill="none"><line x1="0" y1="2" x2="16" y2="2" stroke="${f.color}" stroke-width="2.5"/></svg>`;
+
+                btn.innerHTML = `
+                    ${lineIndicator}
+                    <span class="truncate">${f.label}</span>
+                `;
+                container.appendChild(btn);
+            });
+        }
+
+        function formatLabelDate(iso) {
+            const d = new Date(iso);
+            if (isNaN(d.getTime())) return iso;
+            return d.toLocaleDateString('de-DE', { day: '2-digit', month: '2-digit' }) + ' ' +
+                   d.toLocaleTimeString('de-DE', { hour: '2-digit', minute: '2-digit' });
+        }
+
+        function renderChart() {
+            const ctx = document.getElementById('trendChart').getContext('2d');
+            const filtered = getFilteredEntries();
+
+            const labels = filtered.map(e => formatLabelDate(e.timestamp));
+            const datasets = FACTORS
+                .filter(f => f.visible)
+                .map(f => ({
+                    label: f.label,
+                    data: filtered.map(e => e[f.key]),
+                    borderColor: f.color,
+                    backgroundColor: f.color,
+                    borderWidth: 2.5,
+                    borderDash: f.dashed ? [6, 4] : [],
+                    pointRadius: 3.5,
+                    pointHoverRadius: 5.5,
+                    tension: 0.2
+                }));
+
+            if (chartInstance) {
+                chartInstance.destroy();
+            }
+
+            chartInstance = new Chart(ctx, {
+                type: 'line',
+                data: { labels, datasets },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    interaction: {
+                        mode: 'index',
+                        intersect: false
+                    },
+                    plugins: {
+                        legend: { display: false },
+                        tooltip: {
+                            backgroundColor: 'rgba(15, 23, 42, 0.92)',
+                            padding: 10,
+                            cornerRadius: 10,
+                            callbacks: {
+                                label: ctx => ` ${ctx.dataset.label}: ${ctx.parsed.y > 0 ? '+' + ctx.parsed.y : ctx.parsed.y}`
+                            }
+                        }
+                    },
+                    scales: {
+                        y: {
+                            min: -2.2,
+                            max: 2.2,
+                            ticks: {
+                                stepSize: 1,
+                                callback: v => (Number.isInteger(v) && v >= -2 && v <= 2) ? (v > 0 ? `+${v}` : `${v}`) : '',
+                                font: { family: 'Inter', size: 12, weight: '700' },
+                                color: '#475569'
+                            },
+                            grid: {
+                                color: c => c.tick.value === 0 ? '#94a3b8' : '#f1f5f9',
+                                lineWidth: c => c.tick.value === 0 ? 2 : 1
+                            }
+                        },
+                        x: {
+                            ticks: {
+                                maxRotation: 45,
+                                font: { family: 'Inter', size: 11, weight: '500' },
+                                color: '#64748b'
+                            },
+                            grid: { display: false }
+                        }
+                    }
+                }
+            });
+        }
+    </script>
+</body>
+</html>
