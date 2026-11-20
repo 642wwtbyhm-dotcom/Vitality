@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Tracker</title>
     <script src="https://cdn.tailwindcss.com"></script>
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.3/dist/chart.umd.min.js"></script>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@500;600;700&display=swap" rel="stylesheet">
@@ -23,143 +23,170 @@
 <body class="bg-slate-100 text-slate-900 min-h-screen flex flex-col items-center justify-start p-3 sm:p-6">
 
     <div class="w-full max-w-xl">
-        <!-- Karteikarten-Tabs -->
+        <!-- Karteikarten-Navigation -->
         <nav class="flex gap-1 px-2" role="tablist">
-            <button type="button" id="tab-eingabe" onclick="switchTab('eingabe')" role="tab" aria-selected="true"
-                class="flex-1 py-3 px-4 rounded-t-2xl text-sm sm:text-base font-bold bg-white text-slate-900 shadow-xs border-t border-x border-slate-200 transition">
+            <button type="button" id="tab-eingabe" role="tab" aria-selected="true"
+                class="flex-1 py-3 px-4 rounded-t-2xl text-sm sm:text-base font-bold bg-white text-slate-900 shadow-xs border-t border-x border-slate-200 transition cursor-pointer">
                 Eingabe
             </button>
-            <button type="button" id="tab-grafik" onclick="switchTab('grafik')" role="tab" aria-selected="false"
-                class="flex-1 py-3 px-4 rounded-t-2xl text-sm sm:text-base font-semibold bg-slate-200/80 text-slate-600 hover:text-slate-900 border-t border-x border-transparent transition">
+            <button type="button" id="tab-grafik" role="tab" aria-selected="false"
+                class="flex-1 py-3 px-4 rounded-t-2xl text-sm sm:text-base font-semibold bg-slate-200/80 text-slate-600 hover:text-slate-900 border-t border-x border-transparent transition cursor-pointer">
                 Grafik
             </button>
         </nav>
 
-        <!-- Karteikarten-Inhalt -->
+        <!-- Karteikarten-Container -->
         <main class="bg-white rounded-2xl shadow-sm border border-slate-200 p-4 sm:p-6">
 
-            <!-- SEITE 1: EINGABE -->
+            <!-- KARTEIKARTE 1: EINGABE -->
             <section id="view-eingabe" class="space-y-4">
-                <form id="entry-form" onsubmit="handleSave(event)" class="space-y-3">
-                    <!-- Datum & Uhrzeit -->
-                    <div>
-                        <input type="datetime-local" id="entry-datetime" required
-                            class="w-full rounded-xl border border-slate-300 bg-slate-50 px-3.5 py-2.5 text-sm font-semibold text-slate-900 focus:border-teal-600 focus:bg-white focus:outline-none">
-                    </div>
-
-                    <!-- 6 Kompakte Zeilen -->
-                    <div class="divide-y divide-slate-100 border border-slate-200 rounded-xl overflow-hidden">
-                        <!-- 1. Alkohol -->
-                        <div class="flex items-center justify-between px-3.5 py-2.5 bg-white">
-                            <label for="factor-alkohol" class="text-sm sm:text-base font-semibold text-slate-800 flex items-center gap-2.5">
-                                <span class="w-3 h-3 rounded-full bg-rose-500 shrink-0"></span>
-                                Alkohol
-                            </label>
-                            <select id="factor-alkohol" class="w-24 rounded-lg border border-slate-300 bg-slate-50 pl-3 pr-7 py-1.5 text-sm font-bold text-center text-slate-900 focus:border-teal-600 focus:outline-none">
-                                <option value="-2">-2</option>
-                                <option value="-1">-1</option>
-                                <option value="0" selected>0</option>
-                                <option value="1">+1</option>
-                                <option value="2">+2</option>
-                            </select>
-                        </div>
-
-                        <!-- 2. Luftdruck -->
-                        <div class="flex items-center justify-between px-3.5 py-2.5 bg-white">
-                            <label for="factor-luftdruck" class="text-sm sm:text-base font-semibold text-slate-800 flex items-center gap-2.5">
-                                <span class="w-3 h-3 rounded-full bg-sky-500 shrink-0"></span>
-                                Luftdruck
-                            </label>
-                            <select id="factor-luftdruck" class="w-24 rounded-lg border border-slate-300 bg-slate-50 pl-3 pr-7 py-1.5 text-sm font-bold text-center text-slate-900 focus:border-teal-600 focus:outline-none">
-                                <option value="-2">-2</option>
-                                <option value="-1">-1</option>
-                                <option value="0" selected>0</option>
-                                <option value="1">+1</option>
-                                <option value="2">+2</option>
-                            </select>
-                        </div>
-
-                        <!-- 3. Sport Vortag -->
-                        <div class="flex items-center justify-between px-3.5 py-2.5 bg-white">
-                            <label for="factor-sport" class="text-sm sm:text-base font-semibold text-slate-800 flex items-center gap-2.5">
-                                <span class="w-3 h-3 rounded-full bg-amber-500 shrink-0"></span>
-                                Sport Vortag
-                            </label>
-                            <select id="factor-sport" class="w-24 rounded-lg border border-slate-300 bg-slate-50 pl-3 pr-7 py-1.5 text-sm font-bold text-center text-slate-900 focus:border-teal-600 focus:outline-none">
-                                <option value="-2">-2</option>
-                                <option value="-1">-1</option>
-                                <option value="0" selected>0</option>
-                                <option value="1">+1</option>
-                                <option value="2">+2</option>
-                            </select>
-                        </div>
-
-                        <!-- 4. Schlaf -->
-                        <div class="flex items-center justify-between px-3.5 py-2.5 bg-white">
-                            <label for="factor-schlaf" class="text-sm sm:text-base font-semibold text-slate-800 flex items-center gap-2.5">
-                                <span class="w-3 h-3 rounded-full bg-indigo-500 shrink-0"></span>
-                                Schlaf
-                            </label>
-                            <select id="factor-schlaf" class="w-24 rounded-lg border border-slate-300 bg-slate-50 pl-3 pr-7 py-1.5 text-sm font-bold text-center text-slate-900 focus:border-teal-600 focus:outline-none">
-                                <option value="-2">-2</option>
-                                <option value="-1">-1</option>
-                                <option value="0" selected>0</option>
-                                <option value="1">+1</option>
-                                <option value="2">+2</option>
-                            </select>
-                        </div>
-
-                        <!-- 5. Motivation -->
-                        <div class="flex items-center justify-between px-3.5 py-2.5 bg-white">
-                            <label for="factor-motivation" class="text-sm sm:text-base font-semibold text-slate-800 flex items-center gap-2.5">
-                                <span class="w-3 h-3 rounded-full bg-violet-600 shrink-0"></span>
-                                Motivation
-                            </label>
-                            <select id="factor-motivation" class="w-24 rounded-lg border border-slate-300 bg-slate-50 pl-3 pr-7 py-1.5 text-sm font-bold text-center text-slate-900 focus:border-teal-600 focus:outline-none">
-                                <option value="-2">-2</option>
-                                <option value="-1">-1</option>
-                                <option value="0" selected>0</option>
-                                <option value="1">+1</option>
-                                <option value="2">+2</option>
-                            </select>
-                        </div>
-
-                        <!-- 6. Fitness -->
-                        <div class="flex items-center justify-between px-3.5 py-2.5 bg-white">
-                            <label for="factor-fitness" class="text-sm sm:text-base font-semibold text-slate-800 flex items-center gap-2.5">
-                                <span class="w-3 h-3 rounded-full bg-emerald-600 shrink-0"></span>
-                                Fitness
-                            </label>
-                            <select id="factor-fitness" class="w-24 rounded-lg border border-slate-300 bg-slate-50 pl-3 pr-7 py-1.5 text-sm font-bold text-center text-slate-900 focus:border-teal-600 focus:outline-none">
-                                <option value="-2">-2</option>
-                                <option value="-1">-1</option>
-                                <option value="0" selected>0</option>
-                                <option value="1">+1</option>
-                                <option value="2">+2</option>
-                            </select>
-                        </div>
-                    </div>
-
-                    <!-- Speichern-Button -->
-                    <button type="submit" id="btn-save"
-                        class="w-full py-3.5 px-4 rounded-xl bg-teal-600 hover:bg-teal-700 active:bg-teal-800 text-white font-bold text-base shadow-xs transition flex items-center justify-center gap-2">
-                        <span>Speichern</span>
+                <!-- Nicht-editierbare Datumsanzeige -->
+                <div class="flex items-center justify-between rounded-xl border border-slate-300 bg-slate-50 px-3.5 py-2.5">
+                    <span id="display-date" class="text-sm sm:text-base font-bold text-slate-900 tabular-nums"></span>
+                    <button type="button" id="btn-today"
+                        class="hidden px-2.5 py-1 rounded-lg bg-slate-200 hover:bg-slate-300 active:bg-slate-400 text-slate-800 text-xs font-bold transition cursor-pointer">
+                        Heute
                     </button>
-                </form>
+                </div>
+
+                <!-- 6 Beobachtungswerte -->
+                <div class="divide-y divide-slate-100 border border-slate-200 rounded-xl overflow-hidden">
+                    <!-- 1. Alkohol -->
+                    <div class="flex items-center justify-between gap-2 px-3.5 py-2.5 bg-white">
+                        <label for="factor-alkohol" class="text-sm sm:text-base font-semibold text-slate-800 flex items-center gap-2.5 shrink-0">
+                            <span class="w-3 h-3 rounded-full bg-rose-500 shrink-0"></span>
+                            Alkohol
+                        </label>
+                        <select id="factor-alkohol" class="w-48 sm:w-56 rounded-lg border border-slate-300 bg-slate-50 pl-3 pr-7 py-1.5 text-xs sm:text-sm font-bold text-left text-slate-900 focus:border-teal-600 focus:outline-none">
+                            <option value="2">+2: kein Alkohol</option>
+                            <option value="1">+1: wenig, nur Mittag</option>
+                            <option value="0" selected>0: wenig, nur Abend</option>
+                            <option value="-1">-1: Mittag+Abend</option>
+                            <option value="-2">-2: zu viel</option>
+                        </select>
+                    </div>
+
+                    <!-- 2. Luftdruck -->
+                    <div class="flex items-center justify-between px-3.5 py-2.5 bg-white">
+                        <label for="factor-luftdruck" class="text-sm sm:text-base font-semibold text-slate-800 flex items-center gap-2.5">
+                            <span class="w-3 h-3 rounded-full bg-sky-500 shrink-0"></span>
+                            Luftdruck
+                        </label>
+                        <select id="factor-luftdruck" class="w-24 rounded-lg border border-slate-300 bg-slate-50 pl-3 pr-7 py-1.5 text-sm font-bold text-center text-slate-900 focus:border-teal-600 focus:outline-none">
+                            <option value="-2">-2: unter 980></option>
+                            <option value="-1">-1: unter 990</option>
+                            <option value="0" selected>: unter 1000</option>
+                            <option value="1">+1: unter 1010 </option>
+                            <option value="2">+2: ab 1010</option>
+                        </select>
+                    </div>
+
+                    <!-- 3. Sport Vortag -->
+                    <div class="flex items-center justify-between px-3.5 py-2.5 bg-white">
+                        <label for="factor-sport" class="text-sm sm:text-base font-semibold text-slate-800 flex items-center gap-2.5">
+                            <span class="w-3 h-3 rounded-full bg-amber-500 shrink-0"></span>
+                            Sport Vortag
+                        </label>
+                        <select id="factor-sport" class="w-24 rounded-lg border border-slate-300 bg-slate-50 pl-3 pr-7 py-1.5 text-sm font-bold text-center text-slate-900 focus:border-teal-600 focus:outline-none">
+                            <option value="-2">-2: zu heftig, lang</option>
+                            <option value="-1">-1: heftig kurz</option>
+                            <option value="0" selected>0: Spaziergangniveau</option>
+                            <option value="1">+1: moderat kurz</option>
+                            <option value="2">+2: moderat lang</option>
+                        </select>
+                    </div>
+
+                    <!-- 4. Schlaf -->
+                    <div class="flex items-center justify-between px-3.5 py-2.5 bg-white">
+                        <label for="factor-schlaf" class="text-sm sm:text-base font-semibold text-slate-800 flex items-center gap-2.5">
+                            <span class="w-3 h-3 rounded-full bg-indigo-500 shrink-0"></span>
+                            Schlaf
+                        </label>
+                        <select id="factor-schlaf" class="w-24 rounded-lg border border-slate-300 bg-slate-50 pl-3 pr-7 py-1.5 text-sm font-bold text-center text-slate-900 focus:border-teal-600 focus:outline-none">
+                            <option value="-2">-2: sehr schlecht</option>
+                            <option value="-1">-1: schlecht</option>
+                            <option value="0" selected>0: normal</option>
+                            <option value="1">+1: gut</option>
+                            <option value="2">+2: sehr gut</option>
+                        </select>
+                    </div>
+
+                    <!-- 5. Motivation -->
+                    <div class="flex items-center justify-between px-3.5 py-2.5 bg-white">
+                        <label for="factor-motivation" class="text-sm sm:text-base font-semibold text-slate-800 flex items-center gap-2.5">
+                            <span class="w-3 h-3 rounded-full bg-violet-600 shrink-0"></span>
+                            Motivation
+                        </label>
+                        <select id="factor-motivation" class="w-24 rounded-lg border border-slate-300 bg-slate-50 pl-3 pr-7 py-1.5 text-sm font-bold text-center text-slate-900 focus:border-teal-600 focus:outline-none">
+                            <option value="-2">-2</option>
+                            <option value="-1">-1</option>
+                            <option value="0" selected>0</option>
+                            <option value="1">+1</option>
+                            <option value="2">+2</option>
+                        </select>
+                    </div>
+
+                    <!-- 6. Fitness -->
+                    <div class="flex items-center justify-between px-3.5 py-2.5 bg-white">
+                        <label for="factor-fitness" class="text-sm sm:text-base font-semibold text-slate-800 flex items-center gap-2.5">
+                            <span class="w-3 h-3 rounded-full bg-emerald-600 shrink-0"></span>
+                            Fitness
+                        </label>
+                        <select id="factor-fitness" class="w-24 rounded-lg border border-slate-300 bg-slate-50 pl-3 pr-7 py-1.5 text-sm font-bold text-center text-slate-900 focus:border-teal-600 focus:outline-none">
+                            <option value="-2">-2</option>
+                            <option value="-1">-1</option>
+                            <option value="0" selected>0</option>
+                            <option value="1">+1</option>
+                            <option value="2">+2</option>
+                        </select>
+                    </div>
+                </div>
+
+                <!-- Speichern-Button (ohne Form-Submit für 100% Sandbox-Kompatibilität) -->
+                <button type="button" id="btn-save"
+                    class="w-full py-3.5 px-4 rounded-xl bg-teal-600 hover:bg-teal-700 active:bg-teal-800 text-white font-bold text-base shadow-xs transition flex items-center justify-center gap-2 cursor-pointer">
+                    <span>Speichern</span>
+                </button>
+
+                <!-- CSV Export, Datumsliste & CSV Import -->
+                <div class="pt-1 space-y-2.5">
+                    <button type="button" id="btn-export"
+                        class="w-full py-2.5 px-3.5 rounded-xl border border-slate-300 bg-slate-50 hover:bg-slate-100 active:bg-slate-200 text-slate-800 font-semibold text-xs sm:text-sm transition flex items-center justify-center gap-2 cursor-pointer">
+                        <svg class="w-4 h-4 text-slate-600 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"></path>
+                        </svg>
+                        <span>CSV Export</span>
+                    </button>
+
+                    <!-- Datumsliste erfasster Tage -->
+                    <div id="date-list-container">
+                        <div id="date-list" class="max-h-52 overflow-y-auto divide-y divide-slate-100 border border-slate-200 rounded-xl bg-slate-50/60"></div>
+                    </div>
+
+                    <!-- CSV Import unter der Datumsliste -->
+                    <input type="file" id="input-import" accept=".csv,text/csv" class="hidden">
+                    <button type="button" id="btn-import"
+                        class="w-full py-2.5 px-3.5 rounded-xl border border-slate-300 bg-slate-50 hover:bg-slate-100 active:bg-slate-200 text-slate-800 font-semibold text-xs sm:text-sm transition flex items-center justify-center gap-2 cursor-pointer">
+                        <svg class="w-4 h-4 text-slate-600 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12"></path>
+                        </svg>
+                        <span>CSV Import</span>
+                    </button>
+                </div>
             </section>
 
-            <!-- SEITE 2: GRAFIK -->
+            <!-- KARTEIKARTE 2: GRAFIK -->
             <section id="view-grafik" class="hidden space-y-4">
-                <!-- Kopfzeile: Zeitraum-Buttons & Letzten Eintrag löschen -->
+                <!-- Zeitraum-Umschalter & Papierkorb-Button -->
                 <div class="flex items-center justify-between gap-2">
                     <div class="bg-slate-100 p-1 rounded-xl flex gap-1">
-                        <button type="button" onclick="setRange('7')" id="range-7" class="px-3 py-1.5 rounded-lg text-xs font-bold bg-white text-slate-900 shadow-xs transition">7T</button>
-                        <button type="button" onclick="setRange('30')" id="range-30" class="px-3 py-1.5 rounded-lg text-xs font-semibold text-slate-600 hover:text-slate-900 transition">30T</button>
-                        <button type="button" onclick="setRange('all')" id="range-all" class="px-3 py-1.5 rounded-lg text-xs font-semibold text-slate-600 hover:text-slate-900 transition">Alle</button>
+                        <button type="button" id="range-7" class="px-3 py-1.5 rounded-lg text-xs font-bold bg-white text-slate-900 shadow-xs transition cursor-pointer">7T</button>
+                        <button type="button" id="range-30" class="px-3 py-1.5 rounded-lg text-xs font-semibold text-slate-600 hover:text-slate-900 transition cursor-pointer">30T</button>
+                        <button type="button" id="range-all" class="px-3 py-1.5 rounded-lg text-xs font-semibold text-slate-600 hover:text-slate-900 transition cursor-pointer">Alle</button>
                     </div>
 
-                    <button type="button" onclick="deleteLastEntry()" aria-label="Letzten Eintrag löschen"
-                        class="p-2 rounded-xl border border-slate-200 text-slate-500 hover:text-rose-600 hover:bg-rose-50 transition">
+                    <button type="button" id="btn-delete-latest" title="Letzten Eintrag löschen"
+                        class="p-2 rounded-xl border border-slate-200 bg-slate-50 hover:bg-rose-50 hover:border-rose-200 text-slate-500 hover:text-rose-600 transition cursor-pointer">
                         <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path>
                         </svg>
@@ -167,11 +194,11 @@
                 </div>
 
                 <!-- Liniendiagramm -->
-                <div class="relative w-full h-72 sm:h-80">
+                <div class="relative w-full h-[230px]">
                     <canvas id="trendChart"></canvas>
                 </div>
 
-                <!-- 6 Kompakte Filter-Chips -->
+                <!-- 6 Interaktive Filter-Chips -->
                 <div id="filter-chips" class="grid grid-cols-2 sm:grid-cols-3 gap-2 pt-1"></div>
             </section>
 
@@ -179,235 +206,513 @@
     </div>
 
     <script>
-        const STORAGE_KEY = 'minimal_factor_tracker_v1';
+        const STORAGE_KEY = 'vital_tracker_v2';
+
+        // Sandbox-sicherer Speicher mit In-Memory-Fallback für eingeschränkte Iframes
+        const memoryStore = {};
+        const safeStorage = {
+            getItem(key) {
+                try {
+                    return window.localStorage.getItem(key);
+                } catch (e) {
+                    return Object.prototype.hasOwnProperty.call(memoryStore, key) ? memoryStore[key] : null;
+                }
+            },
+            setItem(key, value) {
+                memoryStore[key] = value;
+                try {
+                    window.localStorage.setItem(key, value);
+                } catch (e) {
+                    // Fallback aktiv: Daten verbleiben zuverlässig im Arbeitsspeicher
+                }
+            }
+        };
 
         const FACTORS = [
-            { key: 'alkohol',    label: 'Alkohol',      color: '#f43f5e', visible: true, dashed: true },
-            { key: 'luftdruck',  label: 'Luftdruck',    color: '#0ea5e9', visible: true, dashed: true },
-            { key: 'sport',      label: 'Sport Vortag', color: '#f59e0b', visible: true, dashed: true },
-            { key: 'schlaf',     label: 'Schlaf',       color: '#6366f1', visible: true, dashed: true },
-            { key: 'motivation', label: 'Motivation',   color: '#8b5cf6', visible: true, dashed: false },
-            { key: 'fitness',    label: 'Fitness',      color: '#10b981', visible: true, dashed: false }
+            { key: 'alkohol',    label: 'Alkohol',      color: '#f43f5e', visible: true, pointOnly: true },
+            { key: 'luftdruck',  label: 'Luftdruck',    color: '#0ea5e9', visible: true, pointOnly: true },
+            { key: 'sport',      label: 'Sport Vortag', color: '#f59e0b', visible: true, pointOnly: true },
+            { key: 'schlaf',     label: 'Schlaf',       color: '#6366f1', visible: true, pointOnly: true },
+            { key: 'motivation', label: 'Motivation',   color: '#8b5cf6', visible: true, pointOnly: false },
+            { key: 'fitness',    label: 'Fitness',      color: '#10b981', visible: true, pointOnly: false }
         ];
 
         let entries = [];
+        let selectedDate = '';
         let currentRange = '7';
         let chartInstance = null;
 
-        document.addEventListener('DOMContentLoaded', () => {
-            setNow();
-            initStorage();
-            renderFilterChips();
-        });
-
-        function toLocalISO(date) {
-            const pad = n => String(n).padStart(2, '0');
-            return `${date.getFullYear()}-${pad(date.getMonth() + 1)}-${pad(date.getDate())}T${pad(date.getHours())}:${pad(date.getMinutes())}`;
+        // Datumsobjekt als lokales ISO-Datum (YYYY-MM-DD) formatieren
+        function toLocalDateISO(dateObj) {
+            const y = dateObj.getFullYear();
+            const m = String(dateObj.getMonth() + 1).padStart(2, '0');
+            const d = String(dateObj.getDate()).padStart(2, '0');
+            return `${y}-${m}-${d}`;
         }
 
-        function setNow() {
-            document.getElementById('entry-datetime').value = toLocalISO(new Date());
+        // ISO-Datum (YYYY-MM-DD) in deutsches Format (TT.MM.JJJJ) umwandeln
+        function formatDisplayDate(isoDate) {
+            const parts = isoDate.split('-');
+            if (parts.length !== 3) return isoDate;
+            return `${parts[2]}.${parts[1]}.${parts[0]}`;
         }
 
-        function initStorage() {
-            try {
-                const raw = localStorage.getItem(STORAGE_KEY);
-                if (raw) {
-                    entries = JSON.parse(raw);
-                } else {
-                    entries = createSampleData();
-                    saveStorage();
-                }
-            } catch (e) {
-                entries = createSampleData();
-            }
+        // ISO-Datum (YYYY-MM-DD) in kurzes Achsen-Label (TT.MM.) umwandeln
+        function formatLabelDate(isoDate) {
+            const parts = isoDate.split('-');
+            if (parts.length !== 3) return isoDate;
+            return `${parts[2]}.${parts[1]}.`;
         }
 
-        function saveStorage() {
-            entries.sort((a, b) => new Date(a.timestamp) - new Date(b.timestamp));
-            localStorage.setItem(STORAGE_KEY, JSON.stringify(entries));
-        }
-
-        function createSampleData() {
-            const data = [];
-            const now = new Date();
-            const pattern = [
-                { alkohol: 0,  luftdruck: 1,  sport: 1,  schlaf: 1,  motivation: 1,  fitness: 1 },
-                { alkohol: -2, luftdruck: -1, sport: 0,  schlaf: -2, motivation: -1, fitness: -2 },
-                { alkohol: 1,  luftdruck: 0,  sport: 1,  schlaf: 0,  motivation: 0,  fitness: 0 },
-                { alkohol: 2,  luftdruck: 2,  sport: 2,  schlaf: 2,  motivation: 2,  fitness: 2 },
-                { alkohol: 0,  luftdruck: -2, sport: -1, schlaf: 0,  motivation: -1, fitness: -1 },
-                { alkohol: -1, luftdruck: -1, sport: 0,  schlaf: -1, motivation: 0,  fitness: -1 },
-                { alkohol: 1,  luftdruck: 1,  sport: 1,  schlaf: 1,  motivation: 1,  fitness: 1 },
-                { alkohol: 2,  luftdruck: 1,  sport: 2,  schlaf: 2,  motivation: 2,  fitness: 2 },
-                { alkohol: 0,  luftdruck: 0,  sport: -1, schlaf: 1,  motivation: 1,  fitness: 0 },
-                { alkohol: 1,  luftdruck: 1,  sport: 1,  schlaf: 1,  motivation: 2,  fitness: 1 }
+        // 10 realistische Beispieldaten (letzte 10 Tage bis heute) generieren
+        function generateDefaultEntries() {
+            const presets = [
+                { alkohol:  0, luftdruck:  1, sport:  1, schlaf:  1, motivation:  1, fitness:  1 },
+                { alkohol: -1, luftdruck:  0, sport:  0, schlaf: -1, motivation:  0, fitness:  0 },
+                { alkohol:  0, luftdruck: -1, sport:  2, schlaf:  1, motivation:  2, fitness:  1 },
+                { alkohol:  1, luftdruck:  0, sport: -1, schlaf: -1, motivation: -1, fitness: -1 },
+                { alkohol:  0, luftdruck:  1, sport:  1, schlaf:  2, motivation:  1, fitness:  2 },
+                { alkohol: -2, luftdruck:  1, sport:  2, schlaf:  2, motivation:  2, fitness:  2 },
+                { alkohol:  0, luftdruck: -1, sport:  0, schlaf:  0, motivation:  0, fitness:  1 },
+                { alkohol:  2, luftdruck: -2, sport: -2, schlaf: -2, motivation: -1, fitness: -2 },
+                { alkohol: -1, luftdruck:  0, sport:  1, schlaf:  1, motivation:  1, fitness:  0 },
+                { alkohol:  0, luftdruck:  1, sport:  1, schlaf:  1, motivation:  2, fitness:  1 }
             ];
 
+            const result = [];
+            const now = new Date();
             for (let i = 9; i >= 0; i--) {
                 const d = new Date(now);
                 d.setDate(now.getDate() - i);
-                d.setHours(8, 30, 0, 0);
-                data.push({
-                    timestamp: toLocalISO(d),
-                    ...pattern[9 - i]
+                const preset = presets[9 - i];
+                result.push({
+                    date: toLocalDateISO(d),
+                    alkohol: preset.alkohol,
+                    luftdruck: preset.luftdruck,
+                    sport: preset.sport,
+                    schlaf: preset.schlaf,
+                    motivation: preset.motivation,
+                    fitness: preset.fitness
                 });
             }
-            return data;
+            return result;
         }
 
-        function switchTab(tab) {
-            const isEingabe = tab === 'eingabe';
-            const tabEin = document.getElementById('tab-eingabe');
-            const tabGra = document.getElementById('tab-grafik');
-            const viewEin = document.getElementById('view-eingabe');
-            const viewGra = document.getElementById('view-grafik');
+        // Daten aus safeStorage laden oder bei leerem/ungültigem Bestand sofort initialisieren
+        function initStorage() {
+            let parsed = null;
+            try {
+                const raw = safeStorage.getItem(STORAGE_KEY);
+                if (raw) {
+                    parsed = JSON.parse(raw);
+                }
+            } catch (e) {
+                parsed = null;
+            }
 
-            if (isEingabe) {
-                tabEin.className = 'flex-1 py-3 px-4 rounded-t-2xl text-sm sm:text-base font-bold bg-white text-slate-900 shadow-xs border-t border-x border-slate-200 transition';
-                tabEin.setAttribute('aria-selected', 'true');
-                tabGra.className = 'flex-1 py-3 px-4 rounded-t-2xl text-sm sm:text-base font-semibold bg-slate-200/80 text-slate-600 hover:text-slate-900 border-t border-x border-transparent transition';
-                tabGra.setAttribute('aria-selected', 'false');
-                viewEin.classList.remove('hidden');
-                viewGra.classList.add('hidden');
+            if (!Array.isArray(parsed) || parsed.length === 0) {
+                entries = generateDefaultEntries();
+                saveStorage();
             } else {
-                tabGra.className = 'flex-1 py-3 px-4 rounded-t-2xl text-sm sm:text-base font-bold bg-white text-slate-900 shadow-xs border-t border-x border-slate-200 transition';
-                tabGra.setAttribute('aria-selected', 'true');
-                tabEin.className = 'flex-1 py-3 px-4 rounded-t-2xl text-sm sm:text-base font-semibold bg-slate-200/80 text-slate-600 hover:text-slate-900 border-t border-x border-transparent transition';
-                tabEin.setAttribute('aria-selected', 'false');
-                viewGra.classList.remove('hidden');
-                viewEin.classList.add('hidden');
+                entries = parsed;
+            }
+        }
+
+        // Aktuellen Datensatz in safeStorage sichern
+        function saveStorage() {
+            try {
+                safeStorage.setItem(STORAGE_KEY, JSON.stringify(entries));
+            } catch (e) {
+                // Fehler abfangen
+            }
+        }
+
+        // Zwischen den beiden Karteikarten ('eingabe' und 'grafik') wechseln
+        function switchTab(tab) {
+            const tabEingabe = document.getElementById('tab-eingabe');
+            const tabGrafik = document.getElementById('tab-grafik');
+            const viewEingabe = document.getElementById('view-eingabe');
+            const viewGrafik = document.getElementById('view-grafik');
+
+            if (tab === 'eingabe') {
+                tabEingabe.setAttribute('aria-selected', 'true');
+                tabGrafik.setAttribute('aria-selected', 'false');
+                tabEingabe.className = 'flex-1 py-3 px-4 rounded-t-2xl text-sm sm:text-base font-bold bg-white text-slate-900 shadow-xs border-t border-x border-slate-200 transition cursor-pointer';
+                tabGrafik.className = 'flex-1 py-3 px-4 rounded-t-2xl text-sm sm:text-base font-semibold bg-slate-200/80 text-slate-600 hover:text-slate-900 border-t border-x border-transparent transition cursor-pointer';
+                viewEingabe.classList.remove('hidden');
+                viewGrafik.classList.add('hidden');
+            } else {
+                tabEingabe.setAttribute('aria-selected', 'false');
+                tabGrafik.setAttribute('aria-selected', 'true');
+                tabGrafik.className = 'flex-1 py-3 px-4 rounded-t-2xl text-sm sm:text-base font-bold bg-white text-slate-900 shadow-xs border-t border-x border-slate-200 transition cursor-pointer';
+                tabEingabe.className = 'flex-1 py-3 px-4 rounded-t-2xl text-sm sm:text-base font-semibold bg-slate-200/80 text-slate-600 hover:text-slate-900 border-t border-x border-transparent transition cursor-pointer';
+                viewGrafik.classList.remove('hidden');
+                viewEingabe.classList.add('hidden');
+                requestAnimationFrame(() => {
+                    renderChart();
+                    if (chartInstance) {
+                        chartInstance.resize();
+                    }
+                });
+            }
+        }
+
+        // Obere Datumsanzeige und 'Heute'-Button aktualisieren
+        function updateDateDisplay() {
+            const displayEl = document.getElementById('display-date');
+            const btnToday = document.getElementById('btn-today');
+            const todayISO = toLocalDateISO(new Date());
+
+            displayEl.textContent = formatDisplayDate(selectedDate);
+            if (selectedDate !== todayISO) {
+                btnToday.classList.remove('hidden');
+            } else {
+                btnToday.classList.add('hidden');
+            }
+        }
+
+        // Werte eines Datums in die 6 Auswahlfelder laden (oder Standard 0 setzen)
+        function loadDateIntoForm(isoDate) {
+            selectedDate = isoDate;
+            updateDateDisplay();
+
+            const existing = entries.find(item => item.date === isoDate);
+            FACTORS.forEach(f => {
+                const selectEl = document.getElementById(`factor-${f.key}`);
+                if (selectEl) {
+                    selectEl.value = existing ? String(existing[f.key]) : '0';
+                }
+            });
+
+            renderDateList();
+        }
+
+        // Zurück zum heutigen Datum wechseln
+        function resetToToday() {
+            loadDateIntoForm(toLocalDateISO(new Date()));
+        }
+
+        // Einzelnen Tageseintrag ohne confirm()-Dialog löschen
+        function deleteEntryByDate(isoDate) {
+            entries = entries.filter(item => item.date !== isoDate);
+            saveStorage();
+            loadDateIntoForm(selectedDate);
+            if (!document.getElementById('view-grafik').classList.contains('hidden')) {
                 renderChart();
             }
         }
 
-        function handleSave(e) {
-            e.preventDefault();
-            const timestamp = document.getElementById('entry-datetime').value;
-            if (!timestamp) return;
+        // Neuesten Eintrag auf der Grafik-Karteikarte löschen
+        function deleteLatestEntry() {
+            if (entries.length === 0) return;
+            const sortedDesc = [...entries].sort((a, b) => b.date.localeCompare(a.date));
+            deleteEntryByDate(sortedDesc[0].date);
+        }
 
-            const entry = {
-                timestamp,
-                alkohol: parseInt(document.getElementById('factor-alkohol').value, 10),
-                luftdruck: parseInt(document.getElementById('factor-luftdruck').value, 10),
-                sport: parseInt(document.getElementById('factor-sport').value, 10),
-                schlaf: parseInt(document.getElementById('factor-schlaf').value, 10),
-                motivation: parseInt(document.getElementById('factor-motivation').value, 10),
-                fitness: parseInt(document.getElementById('factor-fitness').value, 10)
+        // Klickbare Datumsliste aller gespeicherten Tage rendern
+        function renderDateList() {
+            const container = document.getElementById('date-list');
+            container.innerHTML = '';
+
+            const sortedDesc = [...entries].sort((a, b) => b.date.localeCompare(a.date));
+            if (sortedDesc.length === 0) {
+                const emptyRow = document.createElement('div');
+                emptyRow.className = 'px-3.5 py-3 text-xs text-slate-400 text-center';
+                emptyRow.textContent = '—';
+                container.appendChild(emptyRow);
+                return;
+            }
+
+            sortedDesc.forEach(item => {
+                const isSelected = item.date === selectedDate;
+                const row = document.createElement('div');
+                row.className = `flex items-center justify-between px-3.5 py-2 transition ${
+                    isSelected ? 'bg-teal-50/90' : 'hover:bg-slate-100/80'
+                }`;
+
+                const dateBtn = document.createElement('button');
+                dateBtn.type = 'button';
+                dateBtn.className = `flex-1 text-left text-xs sm:text-sm tabular-nums py-0.5 cursor-pointer ${
+                    isSelected ? 'font-bold text-teal-800' : 'font-semibold text-slate-700'
+                }`;
+                dateBtn.textContent = formatDisplayDate(item.date);
+                dateBtn.addEventListener('click', () => loadDateIntoForm(item.date));
+
+                const delBtn = document.createElement('button');
+                delBtn.type = 'button';
+                delBtn.className = 'p-1.5 rounded-lg text-slate-400 hover:text-rose-600 hover:bg-rose-50 transition cursor-pointer';
+                delBtn.innerHTML = `<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path></svg>`;
+                delBtn.addEventListener('click', (e) => {
+                    e.stopPropagation();
+                    deleteEntryByDate(item.date);
+                });
+
+                row.appendChild(dateBtn);
+                row.appendChild(delBtn);
+                container.appendChild(row);
+            });
+        }
+
+        // Tageswerte speichern (überschreibt vorhandenen Tag oder legt ihn neu an)
+        function handleSave() {
+            const newEntry = {
+                date: selectedDate,
+                alkohol: parseInt(document.getElementById('factor-alkohol').value, 10) || 0,
+                luftdruck: parseInt(document.getElementById('factor-luftdruck').value, 10) || 0,
+                sport: parseInt(document.getElementById('factor-sport').value, 10) || 0,
+                schlaf: parseInt(document.getElementById('factor-schlaf').value, 10) || 0,
+                motivation: parseInt(document.getElementById('factor-motivation').value, 10) || 0,
+                fitness: parseInt(document.getElementById('factor-fitness').value, 10) || 0
             };
 
-            entries.push(entry);
+            const existingIndex = entries.findIndex(item => item.date === selectedDate);
+            if (existingIndex >= 0) {
+                entries[existingIndex] = newEntry;
+            } else {
+                entries.push(newEntry);
+            }
+
             saveStorage();
+            renderDateList();
 
-            // Formular zurücksetzen
-            FACTORS.forEach(f => {
-                document.getElementById(`factor-${f.key}`).value = '0';
-            });
-            setNow();
-
-            // Kurzes visuelles Feedback auf dem Button & Wechsel zur Grafik
             const btn = document.getElementById('btn-save');
-            btn.innerHTML = `<svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7"></path></svg>`;
-            btn.classList.replace('bg-teal-600', 'bg-emerald-600');
+            btn.innerHTML = `<svg class="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7"></path></svg>`;
+            btn.classList.remove('bg-teal-600', 'hover:bg-teal-700');
+            btn.classList.add('bg-emerald-600');
 
             setTimeout(() => {
                 btn.innerHTML = `<span>Speichern</span>`;
-                btn.classList.replace('bg-emerald-600', 'bg-teal-600');
+                btn.classList.remove('bg-emerald-600');
+                btn.classList.add('bg-teal-600', 'hover:bg-teal-700');
                 switchTab('grafik');
             }, 350);
         }
 
-        function deleteLastEntry() {
-            if (entries.length === 0) return;
-            entries.pop();
-            saveStorage();
-            renderChart();
+        // Alle gespeicherten Tageseinträge als Semikolon-CSV (UTF-8 mit BOM) exportieren
+        function handleExportCSV() {
+            const sortedAsc = [...entries].sort((a, b) => a.date.localeCompare(b.date));
+            const header = ['Datum', 'Alkohol', 'Luftdruck', 'Sport Vortag', 'Schlaf', 'Motivation', 'Fitness'].join(';');
+            const rows = sortedAsc.map(item => [
+                item.date,
+                item.alkohol,
+                item.luftdruck,
+                item.sport,
+                item.schlaf,
+                item.motivation,
+                item.fitness
+            ].join(';'));
+
+            const csvContent = '\uFEFF' + [header, ...rows].join('\r\n');
+            const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+            const url = URL.createObjectURL(blob);
+
+            const link = document.createElement('a');
+            link.href = url;
+            link.download = `vitaldaten_${toLocalDateISO(new Date())}.csv`;
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+            setTimeout(() => URL.revokeObjectURL(url), 1000);
         }
 
+        // Datumsstrings (YYYY-MM-DD oder TT.MM.JJJJ) normalisieren
+        function normalizeImportedDate(rawDate) {
+            const cleaned = rawDate.replace(/^["']|["']$/g, '').trim();
+            if (/^\d{4}-\d{2}-\d{2}$/.test(cleaned)) {
+                return cleaned;
+            }
+            const deMatch = cleaned.match(/^(\d{1,2})\.(\d{1,2})\.(\d{4})$/);
+            if (deMatch) {
+                const d = deMatch[1].padStart(2, '0');
+                const m = deMatch[2].padStart(2, '0');
+                const y = deMatch[3];
+                return `${y}-${m}-${d}`;
+            }
+            return null;
+        }
+
+        // Gültige Skalenwerte (-2 bis +2) parsen
+        function parseFactorValue(rawVal) {
+            const cleaned = rawVal.replace(/^["']|["']$/g, '').trim();
+            if (!/^[+-]?[0-2]$/.test(cleaned)) return null;
+            const num = parseInt(cleaned, 10);
+            return num >= -2 && num <= 2 ? num : null;
+        }
+
+        // CSV-Datei einlesen, validieren und bestehende Tage ergänzen/überschreiben
+        function handleImportCSV(event) {
+            const file = event.target.files && event.target.files[0];
+            if (!file) return;
+
+            const reader = new FileReader();
+            reader.onload = (e) => {
+                const text = String(e.target.result || '').replace(/^\uFEFF/, '');
+                const lines = text.split(/\r?\n/).map(l => l.trim()).filter(Boolean);
+                let importedCount = 0;
+
+                lines.forEach(line => {
+                    const delimiter = line.includes(';') ? ';' : ',';
+                    const cols = line.split(delimiter).map(c => c.trim());
+                    if (cols.length < 7) return;
+
+                    const isoDate = normalizeImportedDate(cols[0]);
+                    if (!isoDate) return;
+
+                    const vals = cols.slice(1, 7).map(parseFactorValue);
+                    if (vals.some(v => v === null)) return;
+
+                    const entry = {
+                        date: isoDate,
+                        alkohol: vals[0],
+                        luftdruck: vals[1],
+                        sport: vals[2],
+                        schlaf: vals[3],
+                        motivation: vals[4],
+                        fitness: vals[5]
+                    };
+
+                    const idx = entries.findIndex(item => item.date === isoDate);
+                    if (idx >= 0) {
+                        entries[idx] = entry;
+                    } else {
+                        entries.push(entry);
+                    }
+                    importedCount++;
+                });
+
+                if (importedCount > 0) {
+                    saveStorage();
+                    loadDateIntoForm(selectedDate);
+                    if (!document.getElementById('view-grafik').classList.contains('hidden')) {
+                        renderChart();
+                    }
+
+                    const btn = document.getElementById('btn-import');
+                    const originalHTML = btn.innerHTML;
+                    btn.innerHTML = `<svg class="w-4 h-4 text-emerald-600 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7"></path></svg>`;
+                    btn.classList.add('border-emerald-500', 'bg-emerald-50');
+                    setTimeout(() => {
+                        btn.innerHTML = originalHTML;
+                        btn.classList.remove('border-emerald-500', 'bg-emerald-50');
+                    }, 900);
+                }
+            };
+            reader.readAsText(file, 'UTF-8');
+        }
+
+        // Zeitraum-Filter setzen
         function setRange(range) {
             currentRange = range;
             ['7', '30', 'all'].forEach(r => {
-                const el = document.getElementById(`range-${r}`);
-                el.className = r === range
-                    ? 'px-3 py-1.5 rounded-lg text-xs font-bold bg-white text-slate-900 shadow-xs transition'
-                    : 'px-3 py-1.5 rounded-lg text-xs font-semibold text-slate-600 hover:text-slate-900 transition';
+                const btn = document.getElementById(`range-${r}`);
+                if (r === range) {
+                    btn.className = 'px-3 py-1.5 rounded-lg text-xs font-bold bg-white text-slate-900 shadow-xs transition cursor-pointer';
+                } else {
+                    btn.className = 'px-3 py-1.5 rounded-lg text-xs font-semibold text-slate-600 hover:text-slate-900 transition cursor-pointer';
+                }
             });
             renderChart();
         }
 
+        // Gefilterte und chronologisch aufsteigend sortierte Einträge für das Diagramm ermitteln
         function getFilteredEntries() {
-            if (currentRange === 'all') return entries;
+            const sortedAsc = [...entries].sort((a, b) => a.date.localeCompare(b.date));
+            if (currentRange === 'all' || sortedAsc.length === 0) {
+                return sortedAsc;
+            }
             const days = parseInt(currentRange, 10);
+            if (isNaN(days) || days <= 0) {
+                return sortedAsc;
+            }
             const cutoff = new Date();
-            cutoff.setDate(cutoff.getDate() - days);
-            cutoff.setHours(0, 0, 0, 0);
-            return entries.filter(item => new Date(item.timestamp) >= cutoff);
+            cutoff.setDate(cutoff.getDate() - (days - 1));
+            const cutoffISO = toLocalDateISO(cutoff);
+            const filtered = sortedAsc.filter(item => item.date >= cutoffISO);
+            return filtered.length > 0 ? filtered : sortedAsc.slice(-days);
         }
 
+        // Filter-Chips mit passender Vorschau (Punkt für reine Punktwolke, Linie für Verlaufs-Kurve)
         function renderFilterChips() {
             const container = document.getElementById('filter-chips');
             container.innerHTML = '';
 
             FACTORS.forEach(f => {
-                const btn = document.createElement('button');
-                btn.type = 'button';
-                btn.onclick = () => {
+                const chip = document.createElement('button');
+                chip.type = 'button';
+                chip.className = `flex items-center gap-2 px-3 py-2 rounded-xl border text-xs font-semibold transition text-left cursor-pointer ${
+                    f.visible
+                        ? 'bg-slate-50 border-slate-300 text-slate-900'
+                        : 'bg-white border-slate-100 text-slate-400 opacity-55'
+                }`;
+
+                const indicatorWrap = document.createElement('span');
+                indicatorWrap.className = 'w-5 flex items-center justify-center shrink-0';
+
+                if (f.pointOnly) {
+                    const dotIndicator = document.createElement('span');
+                    dotIndicator.className = 'w-2.5 h-2.5 rounded-full';
+                    dotIndicator.style.backgroundColor = f.visible ? f.color : '#cbd5e1';
+                    indicatorWrap.appendChild(dotIndicator);
+                } else {
+                    const lineIndicator = document.createElement('span');
+                    lineIndicator.className = 'w-5';
+                    lineIndicator.style.borderTopWidth = '2.5px';
+                    lineIndicator.style.borderTopStyle = 'solid';
+                    lineIndicator.style.borderTopColor = f.visible ? f.color : '#cbd5e1';
+                    indicatorWrap.appendChild(lineIndicator);
+                }
+
+                const label = document.createElement('span');
+                label.className = 'truncate';
+                label.textContent = f.label;
+
+                chip.appendChild(indicatorWrap);
+                chip.appendChild(label);
+
+                chip.addEventListener('click', () => {
                     f.visible = !f.visible;
                     renderFilterChips();
                     renderChart();
-                };
-                btn.className = f.visible
-                    ? 'flex items-center gap-2 px-3 py-2 rounded-xl text-xs font-bold bg-slate-900 text-white transition'
-                    : 'flex items-center gap-2 px-3 py-2 rounded-xl text-xs font-semibold bg-slate-100 text-slate-500 transition';
+                });
 
-                const lineIndicator = f.dashed
-                    ? `<svg class="w-4 h-2 shrink-0" viewBox="0 0 16 4" fill="none"><line x1="0" y1="2" x2="16" y2="2" stroke="${f.color}" stroke-width="2.5" stroke-dasharray="4 2.5"/></svg>`
-                    : `<svg class="w-4 h-2 shrink-0" viewBox="0 0 16 4" fill="none"><line x1="0" y1="2" x2="16" y2="2" stroke="${f.color}" stroke-width="2.5"/></svg>`;
-
-                btn.innerHTML = `
-                    ${lineIndicator}
-                    <span class="truncate">${f.label}</span>
-                `;
-                container.appendChild(btn);
+                container.appendChild(chip);
             });
         }
 
-        function formatLabelDate(iso) {
-            const d = new Date(iso);
-            if (isNaN(d.getTime())) return iso;
-            return d.toLocaleDateString('de-DE', { day: '2-digit', month: '2-digit' }) + ' ' +
-                   d.toLocaleTimeString('de-DE', { hour: '2-digit', minute: '2-digit' });
-        }
-
+        // Chart.js Liniendiagramm (-2 bis +2) zeichnen
         function renderChart() {
-            const ctx = document.getElementById('trendChart').getContext('2d');
-            const filtered = getFilteredEntries();
+            const canvas = document.getElementById('trendChart');
+            if (!canvas || typeof Chart === 'undefined') return;
 
-            const labels = filtered.map(e => formatLabelDate(e.timestamp));
-            const datasets = FACTORS
-                .filter(f => f.visible)
-                .map(f => ({
-                    label: f.label,
-                    data: filtered.map(e => e[f.key]),
-                    borderColor: f.color,
-                    backgroundColor: f.color,
-                    borderWidth: 2.5,
-                    borderDash: f.dashed ? [6, 4] : [],
-                    pointRadius: 3.5,
-                    pointHoverRadius: 5.5,
-                    tension: 0.2
-                }));
+            const filtered = getFilteredEntries();
+            const labels = filtered.map(item => formatLabelDate(item.date));
+
+            const datasets = FACTORS.filter(f => f.visible).map(f => ({
+                label: f.label,
+                data: filtered.map(item => item[f.key]),
+                borderColor: f.pointOnly ? 'transparent' : f.color,
+                backgroundColor: f.color,
+                pointBackgroundColor: f.color,
+                pointBorderColor: f.color,
+                showLine: !f.pointOnly,
+                borderWidth: f.pointOnly ? 0 : 2.5,
+                pointRadius: f.pointOnly ? 5 : 3.5,
+                pointHoverRadius: f.pointOnly ? 7 : 5.5,
+                tension: 0.25,
+                fill: false
+            }));
 
             if (chartInstance) {
                 chartInstance.destroy();
             }
 
-            chartInstance = new Chart(ctx, {
+            chartInstance = new Chart(canvas.getContext('2d'), {
                 type: 'line',
                 data: { labels, datasets },
                 options: {
                     responsive: true,
                     maintainAspectRatio: false,
+                    animation: false,
                     interaction: {
                         mode: 'index',
                         intersect: false
@@ -415,34 +720,38 @@
                     plugins: {
                         legend: { display: false },
                         tooltip: {
-                            backgroundColor: 'rgba(15, 23, 42, 0.92)',
+                            backgroundColor: '#0f172a',
                             padding: 10,
                             cornerRadius: 10,
                             callbacks: {
-                                label: ctx => ` ${ctx.dataset.label}: ${ctx.parsed.y > 0 ? '+' + ctx.parsed.y : ctx.parsed.y}`
+                                label: ctx => `${ctx.dataset.label}: ${ctx.parsed.y > 0 ? '+' + ctx.parsed.y : ctx.parsed.y}`
                             }
                         }
                     },
                     scales: {
                         y: {
-                            min: -2.2,
-                            max: 2.2,
+                            min: -2.6,
+                            max: 2.6,
                             ticks: {
                                 stepSize: 1,
-                                callback: v => (Number.isInteger(v) && v >= -2 && v <= 2) ? (v > 0 ? `+${v}` : `${v}`) : '',
-                                font: { family: 'Inter', size: 12, weight: '700' },
-                                color: '#475569'
+                                color: '#64748b',
+                                font: { weight: '600', size: 12 },
+                                callback: v => {
+                                    if (!Number.isInteger(v) || v < -2 || v > 2) return '';
+                                    return v > 0 ? `+${v}` : `${v}`;
+                                }
                             },
                             grid: {
-                                color: c => c.tick.value === 0 ? '#94a3b8' : '#f1f5f9',
-                                lineWidth: c => c.tick.value === 0 ? 2 : 1
+                                color: ctx => (ctx.tick && ctx.tick.value === 0 ? '#94a3b8' : '#f1f5f9'),
+                                lineWidth: ctx => (ctx.tick && ctx.tick.value === 0 ? 1.5 : 1)
                             }
                         },
                         x: {
+                            type: 'category',
                             ticks: {
-                                maxRotation: 45,
-                                font: { family: 'Inter', size: 11, weight: '500' },
-                                color: '#64748b'
+                                color: '#64748b',
+                                font: { size: 11 },
+                                maxRotation: 0
                             },
                             grid: { display: false }
                         }
@@ -450,6 +759,31 @@
                 }
             });
         }
+
+        // Initialisierung nach vollständigem DOM-Aufbau
+        document.addEventListener('DOMContentLoaded', () => {
+            initStorage();
+            const todayISO = toLocalDateISO(new Date());
+            loadDateIntoForm(todayISO);
+            renderFilterChips();
+
+            document.getElementById('tab-eingabe').addEventListener('click', () => switchTab('eingabe'));
+            document.getElementById('tab-grafik').addEventListener('click', () => switchTab('grafik'));
+            document.getElementById('btn-today').addEventListener('click', resetToToday);
+            document.getElementById('btn-save').addEventListener('click', handleSave);
+            document.getElementById('btn-export').addEventListener('click', handleExportCSV);
+            document.getElementById('btn-import').addEventListener('click', () => {
+                const fileInput = document.getElementById('input-import');
+                fileInput.value = '';
+                fileInput.click();
+            });
+            document.getElementById('input-import').addEventListener('change', handleImportCSV);
+            document.getElementById('btn-delete-latest').addEventListener('click', deleteLatestEntry);
+
+            document.getElementById('range-7').addEventListener('click', () => setRange('7'));
+            document.getElementById('range-30').addEventListener('click', () => setRange('30'));
+            document.getElementById('range-all').addEventListener('click', () => setRange('all'));
+        });
     </script>
 </body>
 </html>
